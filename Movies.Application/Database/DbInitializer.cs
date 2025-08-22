@@ -19,14 +19,19 @@ public class DbInitializer
                 id uuid primary key,
                 title text not null,
                 slug text not null,
-                yearofrelease integer not null
-            );
+                yearofrelease integer not null);
         """);
         
         await connection.ExecuteAsync("""
             create unique index concurrently if not exists idx_movies_slug 
             on movies 
             using btree(slug);
+        """);
+
+        await connection.ExecuteAsync("""
+            create table if not exists genres (
+                movieId UUID references movies(Id),
+                name text not null);
         """);
     }
 }

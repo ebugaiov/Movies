@@ -1,13 +1,15 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Movies.Api.Mapping;
 using Movies.Application.Repositories;
 using Movies.Application.Services;
 using Movies.Contracts.Requests;
 
-namespace Movies.Api.Controllers
-{
-    [ApiController]
-    public class MoviesController : ControllerBase
+namespace Movies.Api.Controllers;
+
+[Authorize]
+[ApiController] 
+public class MoviesController : ControllerBase
     {
         private readonly IMovieService _movieService;
         
@@ -36,6 +38,7 @@ namespace Movies.Api.Controllers
             return Ok(response);
         }
 
+        [AllowAnonymous]
         [HttpGet(ApiEndpoints.Movies.GetAll)]
         public async Task<IActionResult> GetAllMovies(CancellationToken token)
         {
@@ -63,4 +66,3 @@ namespace Movies.Api.Controllers
             return Ok();
         }
     }
-}

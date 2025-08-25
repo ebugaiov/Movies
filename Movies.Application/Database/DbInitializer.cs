@@ -14,24 +14,28 @@ public class DbInitializer
     public async Task InitializeAsync()
     {
         using var connection = await _dbConnectionFactory.CreateConnectionAsync();
+        
+        // Create movie table
         await connection.ExecuteAsync("""
             create table if not exists movies (
                 id uuid primary key,
                 title text not null,
                 slug text not null,
-                yearofrelease integer not null);
+                yearofrelease integer not null
+            );
         """);
         
-        await connection.ExecuteAsync("""
-            create unique index concurrently if not exists idx_movies_slug 
-            on movies 
-            using btree(slug);
-        """);
-
+        // Create genre table
         await connection.ExecuteAsync("""
             create table if not exists genres (
                 movieId UUID references movies(Id),
                 name text not null);
+        """);
+        
+        // Create unique index on slug
+        await connection.ExecuteAsync("""
+            create unique index if not exists idx_movies_slug 
+            on movies using btree(slug);
         """);
     }
 }

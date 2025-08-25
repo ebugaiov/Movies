@@ -7,7 +7,6 @@ using Movies.Contracts.Requests;
 
 namespace Movies.Api.Controllers;
 
-[Authorize]
 [ApiController] 
 public class MoviesController : ControllerBase
     {
@@ -18,6 +17,7 @@ public class MoviesController : ControllerBase
             _movieService = movieService;
         }
 
+        [Authorize(AuthConstants.AdminUserPolicyName)]
         [HttpPost(ApiEndpoints.Movies.Create)]
         public async Task<IActionResult> CreateMovie(CreateMovieRequest request, 
             CancellationToken token)
@@ -38,7 +38,6 @@ public class MoviesController : ControllerBase
             return Ok(response);
         }
 
-        [AllowAnonymous]
         [HttpGet(ApiEndpoints.Movies.GetAll)]
         public async Task<IActionResult> GetAllMovies(CancellationToken token)
         {
@@ -47,6 +46,7 @@ public class MoviesController : ControllerBase
             return Ok(response);
         }
 
+        [Authorize(AuthConstants.AdminUserPolicyName)]
         [HttpPut(ApiEndpoints.Movies.Update)]
         public async Task<IActionResult> Update(Guid id, UpdateMovieRequest request, 
             CancellationToken token)
@@ -58,6 +58,7 @@ public class MoviesController : ControllerBase
             return Ok(response);
         }
 
+        [Authorize(AuthConstants.AdminUserPolicyName)]
         [HttpDelete(ApiEndpoints.Movies.Delete)]
         public async Task<IActionResult> Delete(Guid id, CancellationToken token)
         {

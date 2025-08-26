@@ -49,4 +49,14 @@ public static class ContractMapping
             Genres = request.Genres.ToList(),
         };
     }
+
+    public static IEnumerable<MovieRatingResponse> MapToResponse(this IEnumerable<MovieRating> ratings)
+    {
+        return ratings.Select(r => new MovieRatingResponse
+        {
+            MovieId = r.MovieId,
+            Slug = r.Slug,
+            Rating = r.Rating,
+        });
+    }
 }

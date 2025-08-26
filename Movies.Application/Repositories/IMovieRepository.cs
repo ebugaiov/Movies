@@ -10,11 +10,11 @@ public interface IMovieRepository
     
     Task<bool> DeleteByIdAsync(Guid id, CancellationToken token = default);
     
-    Task<Movie?> GetByIdAsync(Guid id, CancellationToken token = default);
+    Task<Movie?> GetByIdAsync(Guid id, Guid? userId, CancellationToken token = default);
     
-    Task<Movie?> GetBySlugAsync(string slug, CancellationToken token = default);
+    Task<Movie?> GetBySlugAsync(string slug, Guid? userId = default, CancellationToken token = default);
     
-    Task<IEnumerable<Movie>> GetAllAsync(CancellationToken token = default);
+    Task<IEnumerable<Movie>> GetAllAsync(Guid? userId, CancellationToken token = default);
     
     Task<bool> ExistsByIdAsync(Guid id, CancellationToken token = default);
 }

@@ -82,4 +82,9 @@ public class MovieService : IMovieService
         
         return await _movieRepository.GetAllAsync(options, token);
     }
+
+    public Task<int> GetCountAsync(string? title, int? yearOfRelese, CancellationToken token = default)
+    {
+        return _movieRepository.GetCountAsync(title, yearOfRelese, token);
+    }
 }

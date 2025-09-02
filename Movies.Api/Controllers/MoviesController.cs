@@ -5,11 +5,13 @@ using Movies.Api.Auth;
 using Movies.Api.Mapping;
 using Movies.Application.Services;
 using Movies.Contracts.Requests;
+using Movies.Contracts.Responses;
 
 namespace Movies.Api.Controllers;
 
 [ApiController]
 [ApiVersion(1.0)]
+[ApiVersion(2.0)]
 public class MoviesController : ControllerBase
     {
         private readonly IMovieService _movieService;
@@ -21,16 +23,36 @@ public class MoviesController : ControllerBase
 
         [Authorize(AuthConstants.TrustedMemberPolicyName)]
         [HttpPost(ApiEndpoints.Movies.Create)]
+        [ProducesResponseType(typeof(MovieResponse), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(ValidationFailureResponse), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> CreateMovie(CreateMovieRequest request, 
             CancellationToken token)
         {
             var movie = request.MapToMovie();
             await _movieService.CreateAsync(movie, token);
-            return CreatedAtAction(nameof(Get), new { idOrSlug = movie.Id }, movie);
+            return CreatedAtAction(nameof(GetV1), new { idOrSlug = movie.Id }, movie);
         }
 
+        [MapToApiVersion(1.0)]
         [HttpGet(ApiEndpoints.Movies.Get)]
-        public async Task<IActionResult> Get(string idOrSlug, CancellationToken token)
+        [ProducesResponseType(typeof(MovieResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetV1(string idOrSlug, CancellationToken token)
+        {
+            var userId = HttpContext.GetUserId();
+            var movie = Guid.TryParse(idOrSlug, out var id)
+                ? await _movieService.GetByIdAsync(id, userId, token)
+                : await _movieService.GetBySlugAsync(idOrSlug, userId, token);
+            if (movie is null) return NotFound();
+            var response = movie.MapToResponse();
+            return Ok(response);
+        }
+        
+        [MapToApiVersion(2.0)]
+        [HttpGet(ApiEndpoints.Movies.Get)]
+        [ProducesResponseType(typeof(MovieResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetV2(string idOrSlug, CancellationToken token)
         {
             var userId = HttpContext.GetUserId();
             var movie = Guid.TryParse(idOrSlug, out var id)
@@ -42,8 +64,9 @@ public class MoviesController : ControllerBase
         }
 
         [HttpGet(ApiEndpoints.Movies.GetAll)]
-        public async Task<IActionResult> GetAllMovies(
-            GetAllMoviesRequest request,
+        [ProducesResponseType(typeof(MoviesResponse), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetAll(
+            [FromQuery] GetAllMoviesRequest request,
             CancellationToken token)
         {
             var userId = HttpContext.GetUserId();
@@ -59,6 +82,9 @@ public class MoviesController : ControllerBase
 
         [Authorize(AuthConstants.TrustedMemberPolicyName)]
         [HttpPut(ApiEndpoints.Movies.Update)]
+        [ProducesResponseType(typeof(MovieResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ValidationFailureResponse), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Update(Guid id, UpdateMovieRequest request, 
             CancellationToken token)
         {
@@ -72,6 +98,8 @@ public class MoviesController : ControllerBase
 
         [Authorize(AuthConstants.AdminUserPolicyName)]
         [HttpDelete(ApiEndpoints.Movies.Delete)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete(Guid id, CancellationToken token)
         {
             var deleted = await _movieService.DeleteByIdAsync(id, token);

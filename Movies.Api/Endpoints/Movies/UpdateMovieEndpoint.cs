@@ -25,7 +25,8 @@ public static class UpdateMovieEndpoint
             var response = movie.MapToResponse();
             return TypedResults.Ok(response);
         })
-        .WithName(Name);
+        .WithName(Name)
+        .RequireAuthorization(AuthConstants.TrustedMemberPolicyName);
         
         return app;
     }

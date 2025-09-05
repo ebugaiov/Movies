@@ -1,3 +1,4 @@
+using Movies.Api.Auth;
 using Movies.Application.Services;
 
 namespace Movies.Api.Endpoints.Movies;
@@ -17,7 +18,8 @@ public static class DeleteMovieEndpoint
             if (!deleted) return Results.NotFound();
             return Results.NoContent();
         })
-        .WithName(Name);
+        .WithName(Name)
+        .RequireAuthorization(AuthConstants.AdminUserPolicyName);
         
         return app;
     }

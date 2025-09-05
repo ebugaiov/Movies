@@ -23,7 +23,8 @@ public static class GetMovieEndpoint
             if (movie is null) return Results.NotFound();
             var response = movie.MapToResponse();
             return TypedResults.Ok(response);
-        });
+        })
+        .WithName(Name);
         
         return app;
     }

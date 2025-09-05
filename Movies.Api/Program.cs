@@ -52,7 +52,9 @@ builder.Services.AddApiVersioning(x =>
     x.AssumeDefaultVersionWhenUnspecified = true;
     x.ReportApiVersions = true;
     x.ApiVersionReader = new HeaderApiVersionReader("api-version");
-}).AddMvc().AddApiExplorer();
+}).AddApiExplorer();
+
+builder.Services.AddEndpointsApiExplorer();
 
 // builder.Services.AddControllers();
 

@@ -76,7 +76,10 @@ public class MoviesController : ControllerBase
                 options.Title, 
                 options.YearOfRelease, 
                 token);
-            var response = movies.MapToResponse(request.Page, request.PageSize, movieCount);
+            var response = movies.MapToResponse(
+                request.Page.GetValueOrDefault(PagedRequest.DefaultPage), 
+                request.PageSize.GetValueOrDefault(PagedRequest.DefaultPageSize),
+                movieCount);
             return Ok(response);
         }
 

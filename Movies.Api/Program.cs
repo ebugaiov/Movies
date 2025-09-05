@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Movies.Api.Auth;
+using Movies.Api.Endpoints;
 using Movies.Api.Health;
 using Movies.Api.Mapping;
 using Movies.Api.Swagger;
@@ -53,7 +54,7 @@ builder.Services.AddApiVersioning(x =>
     x.ApiVersionReader = new HeaderApiVersionReader("api-version");
 }).AddMvc().AddApiExplorer();
 
-builder.Services.AddControllers();
+// builder.Services.AddControllers();
 
 builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
 
@@ -89,7 +90,9 @@ app.UseAuthorization();
 
 app.UseMiddleware<ValidationMappingMiddleware>();
 
-app.MapControllers();
+// app.MapControllers();
+
+app.MapApiEndpoints();
 
 var dbInitializer = app.Services.GetRequiredService<DbInitializer>();
 await dbInitializer.InitializeAsync();
